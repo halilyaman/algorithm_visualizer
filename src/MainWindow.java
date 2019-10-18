@@ -2,8 +2,7 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 
 enum NodeTypes {
    StartNode,
@@ -20,18 +19,35 @@ public class MainWindow {
 
    private JFrame frame = new JFrame();
    private JPanel panel = new JPanel();
+   private JPanel bottomPanel = new JPanel();
    private JPanel gridViewPanel = new JPanel();
    private Node[][] nodes = new Node[ROW_SIZE][COL_SIZE];
 
    //index0 start node, index1 end node
    private Node[] previousNodes = new Node[2];
 
+   // keeping for drawing wall
+   private Node tempNode;
+
    void buildScreen() {
       panel.setLayout(new BorderLayout());
       gridViewPanel.setLayout(new GridLayout(ROW_SIZE, COL_SIZE));
       gridViewPanel.setBorder(new EmptyBorder(80,50,80,50));
       buildGridView();
-      panel.add(gridViewPanel);
+
+      JButton clearWholePatternButton = new JButton("Clear All");
+      JButton clearAlgorithmSchemaButton = new JButton("Clear Algorithm");
+
+      clearWholePatternButton.addActionListener(new ClearAllButtonListener());
+      clearAlgorithmSchemaButton.addActionListener(new ClearWithoutWallsButtonListener());
+
+      bottomPanel.setLayout(new FlowLayout());
+      bottomPanel.add(clearWholePatternButton);
+      bottomPanel.add(clearAlgorithmSchemaButton);
+      bottomPanel.setBackground(Color.BLUE);
+
+      panel.add(gridViewPanel, BorderLayout.CENTER);
+      panel.add(bottomPanel, BorderLayout.SOUTH);
 
       frame.setLayout(null);
       frame.setContentPane(panel);
@@ -47,6 +63,7 @@ public class MainWindow {
          for(int col = 0; col < COL_SIZE; col++) {
             nodes[row][col] = new Node(row, col, NodeTypes.AvailableNode);
             nodes[row][col].getNodePanel().addMouseListener(new NodeMouseListener(nodes[row][col]));
+            nodes[row][col].getNodePanel().addMouseMotionListener(new NodeMouseMotionListener());
             gridViewPanel.add(nodes[row][col].getNode());
          }
       }
@@ -76,6 +93,24 @@ public class MainWindow {
             previousNodes[1].setNodeType(NodeTypes.AvailableNode);
             previousNodes[1] = selectedNode;
             selectedNode.setNodeType(NodeTypes.EndNode);
+         }
+      }
+   }
+
+   private void clearAllPattern() {
+      for(int row = 0; row < ROW_SIZE; row++) {
+         for(int col = 0; col < COL_SIZE; col++) {
+            nodes[row][col].setNodeType(NodeTypes.AvailableNode);
+         }
+      }
+   }
+
+   private void clearWithoutWalls() {
+      for(int row = 0; row < ROW_SIZE; row++) {
+         for(int col = 0; col < COL_SIZE; col++) {
+            if(!(nodes[row][col].getNodeType() == NodeTypes.WallNode)) {
+               nodes[row][col].setNodeType(NodeTypes.AvailableNode);
+            }
          }
       }
    }
@@ -117,12 +152,38 @@ public class MainWindow {
 
       @Override
       public void mouseEntered(MouseEvent e) {
-
+         tempNode = selectedNode;
       }
 
       @Override
       public void mouseExited(MouseEvent e) {
 
+      }
+   }
+
+   class NodeMouseMotionListener implements MouseMotionListener {
+      @Override
+      public void mouseDragged(MouseEvent e) {
+         tempNode.setNodeType(NodeTypes.WallNode);
+      }
+
+      @Override
+      public void mouseMoved(MouseEvent e) {
+
+      }
+   }
+
+   class ClearAllButtonListener implements ActionListener {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+         clearAllPattern();
+      }
+   }
+
+   class ClearWithoutWallsButtonListener implements ActionListener {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+         clearWithoutWalls();
       }
    }
 }
