@@ -10,6 +10,24 @@ public class Node {
    private int row;
    private int col;
    private Color color;
+   private int distance;
+   private int distanceToStartNode = Integer.MAX_VALUE;
+
+   public int getDistanceToStartNode() {
+      return distanceToStartNode;
+   }
+
+   public void setDistanceToStartNode(int distanceToStartNode) {
+      this.distanceToStartNode = distanceToStartNode;
+   }
+
+   public int getDistance() {
+      return distance;
+   }
+
+   public void setDistance(int distance) {
+      this.distance = distance;
+   }
 
    public void setNodePanel(JPanel nodePanel) {
       this.nodePanel = nodePanel;
@@ -32,13 +50,14 @@ public class Node {
       if(nodeType == NodeTypes.AvailableNode) {
          this.setColor(Color.white);
       } else if(nodeType == NodeTypes.StartNode) {
+         this.distanceToStartNode = 0;
          this.setColor(Color.green);
       } else if(nodeType == NodeTypes.EndNode) {
          this.setColor(Color.red);
       } else if(nodeType == NodeTypes.WallNode) {
          this.setColor(Color.black);
       } else if(nodeType == NodeTypes.PathNode) {
-         this.setColor(Color.yellow);
+         this.setColor(Color.BLUE);
       } else if(nodeType == NodeTypes.SearchedNode) {
          this.setColor(Color.orange);
       }

@@ -3,6 +3,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 enum NodeTypes {
    StartNode,
@@ -29,6 +32,9 @@ public class MainWindow {
    // keeping for drawing wall
    private Node tempNode;
 
+   private int startNodeRow = -1;
+   private int startNodeCol = -1;
+
    void buildScreen() {
       panel.setLayout(new BorderLayout());
       gridViewPanel.setLayout(new GridLayout(ROW_SIZE, COL_SIZE));
@@ -37,13 +43,16 @@ public class MainWindow {
 
       JButton clearWholePatternButton = new JButton("Clear All");
       JButton clearAlgorithmSchemaButton = new JButton("Clear Algorithm");
+      JButton runAlgorithmButton = new JButton("Run Algorithm");
 
       clearWholePatternButton.addActionListener(new ClearAllButtonListener());
       clearAlgorithmSchemaButton.addActionListener(new ClearWithoutWallsButtonListener());
+      runAlgorithmButton.addActionListener(new RunAlgorithmButtonListener());
 
       bottomPanel.setLayout(new FlowLayout());
       bottomPanel.add(clearWholePatternButton);
       bottomPanel.add(clearAlgorithmSchemaButton);
+      bottomPanel.add(runAlgorithmButton);
       bottomPanel.setBackground(Color.BLUE);
 
       panel.add(gridViewPanel, BorderLayout.CENTER);
@@ -71,29 +80,25 @@ public class MainWindow {
 
    private void updateNode(int val, Node selectedNode) {
       if(val == 1) {
-         if(previousNodes[0] == null) {
-            previousNodes[0] = selectedNode;
-            selectedNode.setNodeType(NodeTypes.StartNode);
-         } else {
+         if(!(previousNodes[0] == null)) {
             if(selectedNode.getNodeType() == NodeTypes.EndNode) {
                previousNodes[1] = null;
             }
             previousNodes[0].setNodeType(NodeTypes.AvailableNode);
-            previousNodes[0] = selectedNode;
-            selectedNode.setNodeType(NodeTypes.StartNode);
          }
+         previousNodes[0] = selectedNode;
+         selectedNode.setNodeType(NodeTypes.StartNode);
+         startNodeRow = selectedNode.getRow();
+         startNodeCol = selectedNode.getCol();
       } else if(val == 0) {
-         if(previousNodes[1] == null) {
-            previousNodes[1] = selectedNode;
-            selectedNode.setNodeType(NodeTypes.EndNode);
-         } else {
+         if(!(previousNodes[1] == null)) {
             if(selectedNode.getNodeType() == NodeTypes.StartNode) {
                previousNodes[0] = null;
             }
             previousNodes[1].setNodeType(NodeTypes.AvailableNode);
-            previousNodes[1] = selectedNode;
-            selectedNode.setNodeType(NodeTypes.EndNode);
          }
+         previousNodes[1] = selectedNode;
+         selectedNode.setNodeType(NodeTypes.EndNode);
       }
    }
 
@@ -103,6 +108,8 @@ public class MainWindow {
             nodes[row][col].setNodeType(NodeTypes.AvailableNode);
          }
       }
+      startNodeRow = -1;
+      startNodeCol = -1;
    }
 
    private void clearWithoutWalls() {
@@ -111,6 +118,102 @@ public class MainWindow {
             if(!(nodes[row][col].getNodeType() == NodeTypes.WallNode)) {
                nodes[row][col].setNodeType(NodeTypes.AvailableNode);
             }
+         }
+      }
+      startNodeRow = -1;
+      startNodeCol = -1;
+   }
+
+   private void setDistanceToCurrentNode(int nodeRow, int nodeCol) {
+      int distance;
+      for(int row = 0; row < ROW_SIZE; row++) {
+         for(int col = 0; col < COL_SIZE; col++) {
+            distance = Math.abs(nodeRow - row) + Math.abs(nodeCol - col);
+            nodes[row][col].setDistance(distance);
+         }
+      }
+   }
+
+   private void printDistance() {
+      for(int row = 0; row < ROW_SIZE; row++) {
+         System.out.println();
+         for(int col = 0; col < COL_SIZE; col++) {
+            System.out.print(nodes[row][col].getDistance() + " ");
+         }
+      }
+   }
+
+   private void runDijkstra() {
+      int distance = 1;
+      if(startNodeCol > -1 && startNodeRow > -1) {
+         Queue<Node> queue = new LinkedList<>();
+         queue.offer(nodes[startNodeRow][startNodeCol]);
+         while(!queue.isEmpty()) {
+            Node currentNode = queue.remove();
+            setDistanceToCurrentNode(currentNode.getRow(), currentNode.getCol());
+            ArrayList<Node> children = new ArrayList<>();
+            for(int row = 0; row < ROW_SIZE; row++) {
+               for(int col = 0; col < COL_SIZE; col++) {
+                  if(nodes[row][col].getDistance() == 1) {
+                     children.add(nodes[row][col]);
+                  }
+               }
+            }
+
+            for(Node child: children) {
+               if(child.getNodeType() == NodeTypes.AvailableNode) {
+                  try {
+                     Thread.sleep(10);
+                  } catch(InterruptedException ex) {
+                     ex.printStackTrace();
+                  }
+                  child.setNodeType(NodeTypes.SearchedNode);
+                  child.setDistanceToStartNode(distance++);
+                  queue.offer(child);
+               } else if(child.getNodeType() == NodeTypes.EndNode) {
+                  drawShortestPath(child.getRow(), child.getCol());
+                  return;
+               }
+            }
+         }
+      }
+   }
+
+   private void drawShortestPath(int nodeRow, int nodeCol) {
+      Queue<Node> queue = new LinkedList<>();
+      queue.offer(nodes[nodeRow][nodeCol]);
+      while(!queue.isEmpty()) {
+         Node currentNode = queue.remove();
+         setDistanceToCurrentNode(currentNode.getRow(), currentNode.getCol());
+         ArrayList<Node> children = new ArrayList<>();
+         for(int row = 0; row < ROW_SIZE; row++) {
+            for(int col = 0; col < COL_SIZE; col++) {
+               if(nodes[row][col].getDistance() == 1) {
+                  children.add(nodes[row][col]);
+               }
+            }
+         }
+         int minDistance = Integer.MAX_VALUE;
+         Node closestNode = null;
+         for(Node child : children) {
+            if(child.getNodeType() == NodeTypes.SearchedNode || child.getNodeType() == NodeTypes.StartNode) {
+               if(child.getNodeType() == NodeTypes.StartNode) {
+                  return;
+               }
+               if(child.getDistanceToStartNode() < minDistance) {
+                  minDistance = child.getDistanceToStartNode();
+                  closestNode = child;
+               }
+            }
+         }
+         if(closestNode != null) {
+            try{
+               Thread.sleep(20);
+            } catch(InterruptedException ex) {
+               ex.printStackTrace();
+            }
+            closestNode.setNodeType(NodeTypes.PathNode);
+            queue.offer(closestNode);
          }
       }
    }
@@ -184,6 +287,15 @@ public class MainWindow {
       @Override
       public void actionPerformed(ActionEvent e) {
          clearWithoutWalls();
+      }
+   }
+
+   class RunAlgorithmButtonListener implements ActionListener {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+         new Thread(() -> {
+            runDijkstra();
+         }).start();
       }
    }
 }
