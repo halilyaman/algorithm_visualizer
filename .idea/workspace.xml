@@ -2,17 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bc53c9ba-0d36-4b55-bc86-1e25f9c964cd" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow$ClearAllButtonListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow$ClearAllButtonListener.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow$ClearWithoutWallsButtonListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow$ClearWithoutWallsButtonListener.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow$NodeMouseListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow$NodeMouseListener.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow$NodeMouseMotionListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow$NodeMouseMotionListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow$RunAlgorithmButtonListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow$RunAlgorithmButtonListener.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/path_finding_visualizer/MainWindow.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/path_finding_visualizer/Node.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/path_finding_visualizer/Node.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/path_finding_visualizer/NodeTypes.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/path_finding_visualizer/NodeTypes.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MainWindow.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainWindow.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Node.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -88,6 +85,11 @@
       <workItem from="1571430194513" duration="5037000" />
       <workItem from="1571477715357" duration="724000" />
       <workItem from="1571558631781" duration="4795000" />
+      <workItem from="1571644254503" duration="695000" />
+      <workItem from="1571676874964" duration="32000" />
+      <workItem from="1571676924807" duration="65000" />
+      <workItem from="1571678682302" duration="717000" />
+      <workItem from="1571688398693" duration="2759000" />
     </task>
     <servers />
   </component>

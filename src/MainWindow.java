@@ -17,8 +17,8 @@ enum NodeTypes {
 }
 
 public class MainWindow {
-   final private int ROW_SIZE = 20;
-   final private int COL_SIZE = 50;
+   final private int ROW_SIZE = 40;
+   final private int COL_SIZE = 90;
 
    private JFrame frame = new JFrame();
    private JPanel panel = new JPanel();
@@ -59,12 +59,14 @@ public class MainWindow {
       panel.add(bottomPanel, BorderLayout.SOUTH);
 
       frame.setLayout(null);
+      int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
+      int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
+      frame.setSize(new Dimension(screenWidth, screenHeight));
       frame.setContentPane(panel);
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       frame.setLocation(0,0);
-      frame.setSize(new Dimension(1500, 800));
-      frame.setVisible(true);
       frame.setResizable(true);
+      frame.setVisible(true);
    }
 
    private void buildGridView() {
@@ -102,23 +104,45 @@ public class MainWindow {
       }
    }
 
-   private void clearAllPattern() {
+   private synchronized void clearAllPattern() {
+      ArrayList<Node> nodesWillBeDeleted = new ArrayList<>();
       for(int row = 0; row < ROW_SIZE; row++) {
          for(int col = 0; col < COL_SIZE; col++) {
-            nodes[row][col].setNodeType(NodeTypes.AvailableNode);
+            if(nodes[row][col].getNodeType() != NodeTypes.AvailableNode) {
+               nodesWillBeDeleted.add(nodes[row][col]);
+            }
          }
+      }
+      for(Node node : nodesWillBeDeleted) {
+         try {
+            Thread.sleep(10);
+         } catch(InterruptedException ex) {
+            ex.printStackTrace();
+         }
+         node.setNodeType(NodeTypes.AvailableNode);
       }
       startNodeRow = -1;
       startNodeCol = -1;
    }
 
-   private void clearWithoutWalls() {
+   private synchronized void clearWithoutWalls() {
+      ArrayList<Node> nodesWillBeDeleted = new ArrayList<>();
       for(int row = 0; row < ROW_SIZE; row++) {
          for(int col = 0; col < COL_SIZE; col++) {
-            if(!(nodes[row][col].getNodeType() == NodeTypes.WallNode)) {
-               nodes[row][col].setNodeType(NodeTypes.AvailableNode);
+            if(!(nodes[row][col].getNodeType() == NodeTypes.WallNode ||
+               nodes[row][col].getNodeType() == NodeTypes.AvailableNode)) {
+               nodesWillBeDeleted.add(nodes[row][col]);
             }
          }
+      }
+
+      for(Node node : nodesWillBeDeleted) {
+         try {
+            Thread.sleep(10);
+         } catch(InterruptedException ex) {
+            ex.printStackTrace();
+         }
+         node.setNodeType(NodeTypes.AvailableNode);
       }
       startNodeRow = -1;
       startNodeCol = -1;
@@ -134,16 +158,7 @@ public class MainWindow {
       }
    }
 
-   private void printDistance() {
-      for(int row = 0; row < ROW_SIZE; row++) {
-         System.out.println();
-         for(int col = 0; col < COL_SIZE; col++) {
-            System.out.print(nodes[row][col].getDistance() + " ");
-         }
-      }
-   }
-
-   private void runDijkstra() {
+   private synchronized void runDijkstra() {
       int distance = 1;
       if(startNodeCol > -1 && startNodeRow > -1) {
          Queue<Node> queue = new LinkedList<>();
@@ -279,23 +294,30 @@ public class MainWindow {
    class ClearAllButtonListener implements ActionListener {
       @Override
       public void actionPerformed(ActionEvent e) {
-         clearAllPattern();
+         Thread clearThread = new Thread(() -> {
+            clearAllPattern();
+         });
+         clearThread.start();
       }
    }
 
    class ClearWithoutWallsButtonListener implements ActionListener {
       @Override
       public void actionPerformed(ActionEvent e) {
-         clearWithoutWalls();
+         Thread clearThread = new Thread(() -> {
+            clearWithoutWalls();
+         });
+         clearThread.start();
       }
    }
 
    class RunAlgorithmButtonListener implements ActionListener {
       @Override
-      public void actionPerformed(ActionEvent e) {
-         new Thread(() -> {
+      public synchronized void actionPerformed(ActionEvent e) {
+         Thread dijkstraThread = new Thread(() -> {
             runDijkstra();
-         }).start();
+         });
+         dijkstraThread.start();
       }
    }
 }
